@@ -45,6 +45,10 @@ type Config struct {
 }
 
 func Run(cfg Config) error {
+	if len(cfg.Directories) == 0 {
+		return nil
+	}
+
 	var jobs []Job
 	for _, d := range cfg.Directories {
 		jobs = append(jobs, NewJob(d, cfg.TFLintConfig))
