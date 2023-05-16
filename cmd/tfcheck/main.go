@@ -63,7 +63,7 @@ func run(c *cli.Context) error {
 	}
 
 	if err := tfcheck.Run(cfg); err != nil {
-		return cli.Exit("", 1)
+		return cli.Exit(err, 1)
 	}
 
 	return nil

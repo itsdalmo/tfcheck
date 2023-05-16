@@ -1,7 +1,6 @@
 package tfcheck
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -83,8 +82,8 @@ func Run(cfg Config) error {
 		return err
 	}
 
-	if model, ok := r.(model); ok && model.failed {
-		return errors.New("one or more jobs failed")
+	if model, ok := r.(model); ok && model.jobsFailed > 0 {
+		return fmt.Errorf("%d job(s) failed", model.jobsFailed)
 	}
 
 	return nil
@@ -98,7 +97,7 @@ type model struct {
 	height     int
 	currentJob int
 	jobsDone   int
-	failed     bool
+	jobsFailed int
 }
 
 type initMsg struct{}
@@ -155,7 +154,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case jobDoneMsg:
 		<-m.sem
 		if msg.failed {
-			m.failed = true // Consider run failed if any job has failed
+			m.jobsFailed++ // Keep track of how many jobs have failed
 		}
 
 		var cmds []tea.Cmd
