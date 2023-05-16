@@ -1,0 +1,32 @@
+version: 3
+
+env:
+  TERM: screen-256color
+
+tasks:
+  default:
+    cmds:
+      - task: test
+
+  test:
+    desc: Run tests.
+    cmds:
+      - task: go-test
+
+  build:
+    desc: Build the binary.
+    cmds:
+      - task: test
+      - goreleaser --snapshot --clean
+
+  install:
+    desc: Install the binary
+    cmds:
+      - go install ./cmd/tfcheck
+
+  go-test:
+    desc: Run tests for all Go code.
+    cmds:
+      - go fmt ./...
+      - go vet -v ./...
+      - go test -race -v ./...
