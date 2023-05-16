@@ -65,7 +65,7 @@ func Run(cfg Config) error {
 		cfg.MaxInParallel = 1
 
 		// Disable bubbletea renderer (View() and tea.Print statements)
-		opts = append(opts, tea.WithoutRenderer())
+		opts = append(opts, tea.WithoutRenderer(), tea.WithInput(nil))
 
 		// Use os.Stdout for the fmt.Fprint statements
 		writer = os.Stdout
