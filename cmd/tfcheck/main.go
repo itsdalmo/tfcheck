@@ -60,6 +60,7 @@ func run(c *cli.Context) error {
 		Directories:   dirs,
 		MaxInParallel: c.Int("max-in-parallel"),
 		NoTUI:         c.Bool("no-tui"),
+		TFLintConfig:  c.String("tflint-config"),
 	}
 
 	if err := tfcheck.Run(cfg); err != nil {
