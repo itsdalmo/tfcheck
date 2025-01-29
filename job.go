@@ -1,7 +1,9 @@
 package tfcheck
 
 import (
+	"errors"
 	"fmt"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -22,12 +24,17 @@ func NewJob(dir, tflintConfig string) Job {
 		NewTask("terraform:fmt", tf.fmt),
 		NewTask("terraform:init", tf.init),
 		NewTask("terraform:validate", tf.validate),
-		NewTask("terraform:tflint", tf.tflint),
+	}
+	_, err := exec.LookPath("tflint")
+	if err != nil && !errors.Is(err, exec.ErrNotFound) {
+		panic(fmt.Errorf("failed to look up 'tflint' in PATH: %v", err))
+	}
+	if err == nil {
+		job.tasks = append(job.tasks, NewTask("terraform:tflint", tf.tflint))
 	}
 	for i := range job.tasks {
 		job.tasks[i].jobID = job.id
 	}
-
 	return job
 }
 
