@@ -13,3 +13,8 @@ $ which tfcheck
 # Inside a terraform directory
 $ tfcheck
 ```
+
+## TODO
+
+1. Use context cancellation instead of capturing input.
+2. Figure out how to set color properly.

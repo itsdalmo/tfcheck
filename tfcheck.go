@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-isatty"
+	"github.com/muesli/termenv"
 )
 
 var (
@@ -42,12 +43,15 @@ type Config struct {
 	TFLintConfig  string
 	MaxInParallel int
 	NoTUI         bool
+	NoColor       bool
 }
 
 func Run(cfg Config) error {
 	if len(cfg.Directories) == 0 {
 		return nil
 	}
+
+	lipgloss.NewStyle()
 
 	var jobs []Job
 	for _, d := range cfg.Directories {
@@ -73,6 +77,11 @@ func Run(cfg Config) error {
 
 		// Use os.Stdout for the fmt.Fprint statements
 		writer = os.Stdout
+	}
+
+	lipgloss.SetColorProfile(termenv.ANSI256)
+	if cfg.NoColor {
+		lipgloss.SetColorProfile(termenv.Ascii)
 	}
 
 	semaphore := make(chan struct{}, cfg.MaxInParallel)

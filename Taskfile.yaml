@@ -9,9 +9,11 @@ tasks:
       - task: test
 
   test:
-    desc: Run tests.
+    desc: Run tests
     cmds:
-      - task: go-test
+      - go fmt ./...
+      - go vet -v ./...
+      - go test -race -v ./...
 
   build:
     desc: Build the binary.
@@ -24,9 +26,12 @@ tasks:
     cmds:
       - go install ./cmd/tfcheck
 
-  go-test:
-    desc: Run tests for all Go code.
+  docker:build:
+    desc: Build the docker image
     cmds:
-      - go fmt ./...
-      - go vet -v ./...
-      - go test -race -v ./...
+      - docker build -t itsdalmo/tfcheck:dev .
+
+  docker:run:
+    desc: Run tfcheck container against infrastructure repository
+    cmds:
+      - docker run -it -v /Users/dalmo/code/github.com/itsdalmo/infrastructure:/infra -w /infra --rm itsdalmo/tfcheck:dev

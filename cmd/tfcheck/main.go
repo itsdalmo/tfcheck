@@ -23,6 +23,10 @@ func main() {
 				Name:  "no-tui",
 				Usage: "Disable the TUI even if we are running in a TTY",
 			},
+			&cli.BoolFlag{
+				Name:  "no-color",
+				Usage: "Disable colors",
+			},
 			&cli.IntFlag{
 				Name:    "max-in-parallel",
 				Usage:   "Limit the number of jobs executed in parallel",
