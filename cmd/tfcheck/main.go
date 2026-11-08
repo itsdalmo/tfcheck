@@ -14,8 +14,8 @@ var version = "dev"
 func main() {
 	app := &cli.App{
 		Name:      "tfcheck",
-		Usage:     "Runner for terraform checks (fmt, validate and tflint)",
-		UsageText: "tfcheck [--no-tui] [--max-in-parallel=<number>] [--tflint-config=<path>] [DIRECTORY]",
+		Usage:     "Runner for terraform (or OpenTofu) checks (fmt, validate and tflint)",
+		UsageText: "tfcheck [--no-tui] [--max-in-parallel=<number>] [--binary=<terraform|tofu>] [--tflint-config=<path>] [DIRECTORY]",
 		Version:   version,
 		Action:    run,
 		Flags: []cli.Flag{
@@ -27,6 +27,11 @@ func main() {
 				Name:    "max-in-parallel",
 				Usage:   "Limit the number of jobs executed in parallel",
 				Aliases: []string{"p"},
+			},
+			&cli.StringFlag{
+				Name:    "binary",
+				Usage:   "Binary to run the checks with, e.g. terraform or tofu (default: the first of them in PATH)",
+				EnvVars: []string{"TFCHECK_BINARY"},
 			},
 			&cli.StringFlag{
 				Name:  "tflint-config",
@@ -56,8 +61,17 @@ func run(c *cli.Context) error {
 		return cli.Exit(err, 1)
 	}
 
+	binary := c.String("binary")
+	if binary == "" && len(dirs) > 0 {
+		binary, err = tfcheck.FindBinary()
+		if err != nil {
+			return cli.Exit(err, 1)
+		}
+	}
+
 	cfg := tfcheck.Config{
 		Directories:   dirs,
+		Binary:        binary,
 		MaxInParallel: c.Int("max-in-parallel"),
 		NoTUI:         c.Bool("no-tui"),
 		TFLintConfig:  c.String("tflint-config"),

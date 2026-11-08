@@ -39,6 +39,7 @@ func (s Status) String() string {
 
 type Config struct {
 	Directories   []string
+	Binary        string // terraform or tofu (or a path to either)
 	TFLintConfig  string
 	MaxInParallel int
 	NoTUI         bool
@@ -51,7 +52,7 @@ func Run(cfg Config) error {
 
 	var jobs []Job
 	for _, d := range cfg.Directories {
-		jobs = append(jobs, NewJob(d, cfg.TFLintConfig))
+		jobs = append(jobs, NewJob(d, cfg.Binary, cfg.TFLintConfig))
 	}
 
 	if cfg.MaxInParallel == 0 {
