@@ -3,6 +3,7 @@ package tfcheck
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -11,15 +12,31 @@ import (
 	"strings"
 )
 
-func newTerraformRunner(dir, tflintConfig string) terraformRunner {
+// FindBinary returns the first of terraform and tofu (OpenTofu) found in PATH.
+func FindBinary() (string, error) {
+	for _, name := range []string{"terraform", "tofu"} {
+		_, err := exec.LookPath(name)
+		if err == nil {
+			return name, nil
+		}
+		if !errors.Is(err, exec.ErrNotFound) {
+			return "", fmt.Errorf("failed to look up '%s' in PATH: %v", name, err)
+		}
+	}
+	return "", errors.New("neither 'terraform' nor 'tofu' found in PATH")
+}
+
+func newTerraformRunner(dir, binary, tflintConfig string) terraformRunner {
 	return terraformRunner{
 		dir:          dir,
+		binary:       binary,
 		tflintConfig: tflintConfig,
 	}
 }
 
 type terraformRunner struct {
 	dir          string
+	binary       string
 	tflintConfig string
 }
 
@@ -34,7 +51,7 @@ func (r *terraformRunner) run(w io.Writer, command string, args ...string) error
 }
 
 func (r *terraformRunner) fmt(w io.Writer) error {
-	err := r.run(w, "terraform", "fmt", "-list=true", "-check=true", "-recursive=false")
+	err := r.run(w, r.binary, "fmt", "-list=true", "-check=true", "-recursive=false")
 	if err != nil {
 		return err
 	}
@@ -42,7 +59,7 @@ func (r *terraformRunner) fmt(w io.Writer) error {
 }
 
 func (r *terraformRunner) init(w io.Writer) error {
-	err := r.run(w, "terraform", "init", "-backend=false", "-input=false", "-get=true", "-no-color")
+	err := r.run(w, r.binary, "init", "-backend=false", "-input=false", "-get=true", "-no-color")
 	if err != nil {
 		return err
 	}
@@ -55,7 +72,7 @@ func (r *terraformRunner) validate(w io.Writer) error {
 	var b bytes.Buffer
 	w = io.MultiWriter(w, &b)
 
-	err := r.run(w, "terraform", "validate")
+	err := r.run(w, r.binary, "validate")
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func NewJob(dir, tflintConfig string) Job {
+func NewJob(dir, binary, tflintConfig string) Job {
 	job := Job{
 		id:        nextID(),
 		name:      dir,
@@ -19,7 +19,7 @@ func NewJob(dir, tflintConfig string) Job {
 		stopwatch: stopwatch.NewWithInterval(time.Millisecond),
 	}
 
-	tf := newTerraformRunner(dir, tflintConfig)
+	tf := newTerraformRunner(dir, binary, tflintConfig)
 	job.tasks = []Task{
 		NewTask("terraform:fmt", tf.fmt),
 		NewTask("terraform:init", tf.init),
