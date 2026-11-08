@@ -39,16 +39,3 @@ changelog:
 
 release:
   prerelease: auto
-
-brews:
-  - name: tfcheck
-    description: Template for go project and tap.
-    homepage: https://github.com/itsdalmo/tfcheck
-    install: |
-      bin.install "tfcheck"
-    test: |
-      system "#{bin}/tfcheck --version"
-    tap:
-      owner: itsdalmo
-      name: homebrew-tap
-    folder: Formula
