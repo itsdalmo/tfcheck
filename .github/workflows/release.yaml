@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,4 +26,4 @@ jobs:
           version: v1.18
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
